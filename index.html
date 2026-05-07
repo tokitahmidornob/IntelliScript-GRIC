@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="slides-format" content="viewport">
+    <title>IntelliScript BD - GRIC Pitch Deck</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style>
+        :root {
+            --color-bg: #050b14;
+            --color-surface: #111827;
+            --color-text: #e2e8f0;
+            --color-accent-1: #00d4ff;
+            /* Tech Cyan */
+            --color-accent-2: #ef4444;
+            /* Emergency Red */
+            --color-accent-3: #00ff88;
+            /* Safe Green */
+            --color-accent-4: #a855f7;
+            /* Purple */
+            --color-vignette: rgba(0, 0, 0, 0.85);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        html,
+        body {
+            background: var(--color-bg);
+            margin: 0;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--color-text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Custom Cursor */
+        .cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 6px;
+            background: #00d4ff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #00d4ff;
+        }
+
+        .cursor-trail {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        /* Slides */
+        .deck {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .slide>.content {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            max-width: 1250px;
+            padding: clamp(1.5rem, 4vw, 3.5rem);
+        }
+
+        /* Nav */
+        .nav-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            background: rgba(0, 212, 255, 0.04);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 212, 255, 0.12);
+        }
+
+        .nav-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: rgba(0, 212, 255, 0.08);
+            color: #00d4ff;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            pointer-events: auto;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 212, 255, 0.18);
+        }
+
+        .slide-dots {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 300px;
+            pointer-events: auto;
+        }
+
+        .slide-dots .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.2);
+            transition: 0.3s;
+        }
+
+        .slide-dots .dot.active {
+            background: #00d4ff;
+            transform: scale(1.5);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        /* Glassmorphism Elements */
+        .glass-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .glass-table th {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .glass-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
+        }
+
+        .glass-table tr:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(8px);
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        /* Funnel Cards (Slide 6) */
+        .funnel-card {
+            position: relative;
+            border-bottom: 2px solid var(--funnel-color);
+            box-shadow: 0 10px 20px -5px var(--funnel-color-alpha);
+        }
+
+        .funnel-card:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            bottom: -17px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 15px;
+            background: var(--funnel-color);
+            box-shadow: 0 0 8px var(--funnel-color);
+            z-index: 1;
+        }
+
+        /* Roadmap Timeline (Slide 10) */
+        .timeline-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 20px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 20px;
+            left: 5%;
+            right: 5%;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #a855f7, #00ff88);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+            z-index: 0;
+            border-radius: 2px;
+        }
+
+        .timeline-card {
+            position: relative;
+            margin-top: 40px;
+        }
+
+        .timeline-card::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--node-color), transparent);
+            z-index: 1;
+        }
+
+        .timeline-node {
+            position: absolute;
+            top: -46px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 14px;
+            background: var(--color-bg);
+            border: 2px solid var(--node-color);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .timeline-card.staggered {
+            margin-top: 60px;
+        }
+
+        .timeline-card.staggered::before {
+            top: -60px;
+            height: 60px;
+        }
+
+        .timeline-card.staggered .timeline-node {
+            top: -66px;
+        }
+
+        .pulse-node {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 var(--node-color-alpha);
+            }
+
+            70% {
+                box-shadow: 0 0 0 12px rgba(0, 0, 0, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+            }
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 212, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .alert-card {
+            border-left: 4px solid #ef4444;
+        }
+
+        .safe-card {
+            border-left: 4px solid #00ff88;
+        }
+
+        .info-card {
+            border-left: 4px solid #00d4ff;
+        }
+
+        /* Image Containers */
+        .img-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            overflow: visible;
+            position: relative;
+        }
+
+        .img-container img {
+            object-fit: contain;
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            margin: auto;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .img-container:hover img {
+            transform: scale(1.03);
+        }
+
+        /* Animated Vertical Bar Chart */
+        .vertical-chart-wrapper {
+            margin-bottom: 50px;
+            margin-left: 10px;
+            margin-top: 30px;
+        }
+
+        .vertical-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 250px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 0 10px;
+        }
+
+        .bar-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            width: 60px;
+            height: 100%;
+            position: relative;
+        }
+
+        .bar-col-fill {
+            width: 100%;
+            height: 0;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            transition: height 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+        }
+
+        .slide.active .bar-col-fill {
+            height: var(--target-height);
+            box-shadow: 0 0 15px var(--bar-glow);
+        }
+
+        .bar-col-percent {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            opacity: 0;
+            transition: opacity 0.5s ease 1.5s;
+        }
+
+        .slide.active .bar-col-percent {
+            opacity: 1;
+        }
+
+        .bar-col-label {
+            position: absolute;
+            bottom: -40px;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            width: 100px;
+            line-height: 1.2;
+        }
+
+        /* Environment & Background Effects */
+        .background-container {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: var(--color-bg);
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .scanlines::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 212, 255, 0.015) 2px, rgba(0, 212, 255, 0.015) 4px);
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float-slow 15s ease-in-out infinite;
+            mix-blend-mode: screen;
+        }
+
+        .blob:nth-child(2) {
+            animation: float-drift 20s ease-in-out infinite reverse;
+        }
+
+        .vignette {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: radial-gradient(ellipse at center, transparent 20%, var(--color-vignette) 100%);
+        }
+
+        @keyframes float-slow {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(60px, -40px) scale(1.1);
+            }
+        }
+
+        @keyframes float-drift {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-50px, 50px) rotate(5deg);
+            }
+        }
+
+        .theory-text {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            padding: 1rem;
+            border-left: 2px solid #00d4ff;
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.05) 0%, transparent 100%);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Workflow Timeline */
+        .workflow-line {
+            position: absolute;
+            top: 30px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: rgba(0, 212, 255, 0.2);
+            z-index: 0;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-trail" id="cursorTrail"></div>
+
+    <div class="background-container">
+        <div class="blob" style="width:600px;height:600px;top:-150px;right:-100px;background:#00d4ff;opacity:0.06;">
+        </div>
+        <div class="blob" style="width:500px;height:500px;bottom:-100px;left:-100px;background:#00ff88;opacity:0.04;">
+        </div>
+        <canvas id="plexusCanvas" style="position:absolute;inset:0;z-index:1;"></canvas>
+        <div class="vignette"></div>
+        <div class="scanlines"></div>
+    </div>
+
+    <div class="deck">
+
+        <div class="slide active" data-slide="1">
+            <div class="content text-center">
+                <div class="reveal" style="font-size:60px;margin-bottom:1rem; color:#00d4ff;">⚕️</div>
+                <div class="reveal"
+                    style="display:inline-block;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.25);border-radius:4px;padding:4px 14px;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:4px;color:#00d4ff;text-transform:uppercase;margin-bottom:1.5rem;">
+                    GLOBAL ROBOTICS & INNOVATION CHAMPIONSHIP</div>
+                <h1 class="reveal"
+                    style="font-family:'Orbitron',monospace;font-size:clamp(3rem,6vw,5.5rem);font-weight:900;background:linear-gradient(135deg,#ffffff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:0.5rem;">
+                    IntelliScript BD</h1>
+                <h2 class="reveal"
+                    style="font-family:'Orbitron'; font-size: 1.8rem; color:#00ff88; margin-bottom: 2rem;">The
+                    Safety-First Clinical Co-Pilot</h2>
+                <p class="reveal" style="font-size:1.2rem;color:#94a3b8; max-width:800px; margin: 0 auto 3rem;">"A
+                    nationwide digital safety net protecting patients from fatal prescription errors and counterfeit
+                    drugs."</p>
+                <p class="reveal" style="font-size:0.9rem;color:#64748b;letter-spacing:2px;text-transform:uppercase;">
+                    Team: Toki Tahmid Ornob & Tabasum Aktar</p>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="2">
+            <div class="content">
+                <h2 class="reveal"
+                    style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:2rem;text-align:center;">
+                    The Critical Failures of the Status Quo</h2>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items:center;">
+                    <div style="display:flex; flex-direction:column; gap: 15px;">
+                        <div class="reveal glass-card alert-card" style="padding:1rem;">
+                            <h3 style="color:#ef4444;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">1.
+                                Clinical Blindness</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem;">Doctors prescribe in a data vacuum. A study in
+                                the Bangladesh Pharmaceutical Journal found <strong>366 dangerous drug
+                                    interactions</strong> in just 200 scripts, with 12% being potentially lethal.</p>
+                        </div>
+                        <div class="reveal glass-card alert-card" style="padding:1rem;">
+                            <h3 style="color:#ef4444;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">2.
+                                The Handwritten Hazard</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem;">Illegible penmanship forces pharmacists to
+                                "guess" dosages (e.g. 10mg vs 70mg), leading to systemic toxicity before the first dose
+                                is finished.</p>
+                        </div>
+                        <div class="reveal glass-card alert-card" style="padding:1rem;">
+                            <h3 style="color:#ef4444;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">3.
+                                Fragmented Identity</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem;">Medical history is ephemeral. In ER situations,
+                                inability to communicate a penicillin allergy forces doctors into fatal "blind
+                                interventions."</p>
+                        </div>
+                        <div class="reveal glass-card alert-card" style="padding:1rem;">
+                            <h3 style="color:#ef4444;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">4.
+                                Unnecessary Testing</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem;">Lost paper records force doctors to re-order
+                                exact same tests (X-rays, ECGs), creating a massive financial drain on vulnerable
+                                families.</p>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; height: 100%; max-height: 60vh;">
+                        <div class="reveal img-container" style="flex:1;">
+                            <img src="Evidence-Jhalokathi-Prescription-Hazard.jpg" alt="Prescription Hazard Evidence">
+                        </div>
+                        <div class="reveal"
+                            style="background:rgba(0,0,0,0.8); padding:10px; text-align:center; font-family:'Orbitron'; font-size:0.8rem; color:#ef4444; border-radius: 4px; margin-top: 15px;">
+                            THE REALITY OF PAPER</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="3">
+            <div class="content">
+                <h2 class="reveal"
+                    style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:1rem;text-align:center;">
+                    Solution Overview</h2>
+                <div class="reveal theory-text text-center" style="max-width:900px; margin:0 auto 2rem;">
+                    "IntelliScript BD is a <strong>Sovereign Health Infrastructure</strong>—an offline-first digital
+                    clinical pad designed to replace the dangerous paper-based status quo."
+                </div>
+
+                <div style="display:grid; grid-template-rows: auto 1fr; gap: 30px; padding-bottom: 40px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                        <div class="reveal glass-card info-card text-center" style="padding: 1.5rem; height: 100%;">
+                            <h3 style="color:#00d4ff;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">For
+                                the
+                                Doctor</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem; margin:0;"><strong>Active
+                                    Interception.</strong> Acts as a digital safety net that physically prevents lethal
+                                prescribing errors in real-time.</p>
+                        </div>
+                        <div class="reveal glass-card safe-card text-center" style="padding: 1.5rem; height: 100%;">
+                            <h3 style="color:#00ff88;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">For
+                                the
+                                Patient</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem; margin:0;"><strong>Identity
+                                    Permanence.</strong> Ensures medical history and allergies are never lost,
+                                regardless of
+                                where they seek care.</p>
+                        </div>
+                        <div class="reveal glass-card info-card text-center"
+                            style="border-color:#a855f7; padding: 1.5rem; height: 100%;">
+                            <h3 style="color:#a855f7;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">For
+                                the
+                                Pharmacist</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem; margin:0;">
+                                <strong>Cryptographic Certainty.</strong> Eliminates handwriting guesswork with a
+                                verified,
+                                tamper-proof digital handshake.
+                            </p>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                        <div class="reveal img-container"
+                            style="height: 300px; background: rgba(255,255,255,0.02); border-radius: 12px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);">
+                            <img src="Sentinel%20Override.png" alt="Sentinel Override UI"
+                                style="object-fit: contain; width: 100%; height: 100%;">
+                        </div>
+                        <div class="reveal img-container"
+                            style="height: 300px; background: rgba(255,255,255,0.02); border-radius: 12px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);">
+                            <img src="Alert-of-Active-Allergy.png" alt="Allergy Alert UI"
+                                style="object-fit: contain; width: 100%; height: 100%;">
+                        </div>
+                        <div class="reveal img-container"
+                            style="height: 300px; background: rgba(255,255,255,0.02); border-radius: 12px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);">
+                            <img src="Prescription-QR-Code.png" alt="QR Code Signature"
+                                style="object-fit: contain; width: 100%; height: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="4">
+            <div class="content text-center">
+                <h2 class="reveal" style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:3rem;">How
+                    It Works: Zero-Trust Ecosystem</h2>
+
+                <div class="reveal"
+                    style="position:relative; display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div class="workflow-line"></div>
+
+                    <div style="width:22%; position:relative; z-index:2;">
+                        <div
+                            style="width:60px; height:60px; background:#050b14; border:3px solid #00d4ff; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; font-size:1.5rem;">
+                            🤝</div>
+                        <h3 style="color:#00d4ff;font-family:'Orbitron';font-size:1rem;margin-bottom:10px;">1. Authorize
+                        </h3>
+                        <p style="color:#94a3b8;font-size:0.8rem;">Patient scans phone to grant doctor temporary,
+                            read-only access to their Universal Health Profile.</p>
+                    </div>
+
+                    <div style="width:22%; position:relative; z-index:2;">
+                        <div
+                            style="width:60px; height:60px; background:#050b14; border:3px solid #00d4ff; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; font-size:1.5rem;">
+                            💻</div>
+                        <h3 style="color:#00d4ff;font-family:'Orbitron';font-size:1rem;margin-bottom:10px;">2. Prescribe
+                        </h3>
+                        <p style="color:#94a3b8;font-size:0.8rem;">Doctor writes script on offline HTML5 pad. AI
+                            Sentinel cross-references data to block lethal interactions instantly.</p>
+                    </div>
+
+                    <div style="width:22%; position:relative; z-index:2;">
+                        <div
+                            style="width:60px; height:60px; background:#050b14; border:3px solid #00ff88; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; font-size:1.5rem;">
+                            🔒</div>
+                        <h3 style="color:#00ff88;font-family:'Orbitron';font-size:1rem;margin-bottom:10px;">3. Hash</h3>
+                        <p style="color:#94a3b8;font-size:0.8rem;">System generates unbreakable SHA-256 QR code. Patient
+                            scans to store verified payload in Sovereign Wallet.</p>
+                    </div>
+
+                    <div style="width:22%; position:relative; z-index:2;">
+                        <div
+                            style="width:60px; height:60px; background:#050b14; border:3px solid #a855f7; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; font-size:1.5rem;">
+                            💊</div>
+                        <h3 style="color:#a855f7;font-family:'Orbitron';font-size:1rem;margin-bottom:10px;">4. Dispense
+                        </h3>
+                        <p style="color:#94a3b8;font-size:0.8rem;">Pharmacist scans patient's phone. Device-to-device
+                            decryption verifies authenticity, preventing counterfeit drugs.</p>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="slide" data-slide="5">
+            <div class="content">
+                <h2 class="reveal"
+                    style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:2rem;text-align:center;">
+                    Why Now? The Burning Platform</h2>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items:center;">
+                    <div>
+                        <div class="reveal theory-text"
+                            style="border-color:#ef4444; background: linear-gradient(90deg, rgba(239,68,68,0.05) 0%, transparent 100%); margin-bottom: 1rem;">
+                            <strong>March 2026 (Sunamganj):</strong> 3-year-old poisoned by wrong medication due to
+                            doctor’s handwriting misinterpretation. Heavy fines issued to pharmacy.
+                        </div>
+                        <div class="reveal theory-text"
+                            style="border-color:#ef4444; background: linear-gradient(90deg, rgba(239,68,68,0.05) 0%, transparent 100%); margin-bottom: 1rem;">
+                            <strong>Nov 2025 (Noakhali):</strong> 4-year-old died within an hour of receiving a lethal
+                            injection administered without a verified medical history.
+                        </div>
+                        <div class="reveal theory-text"
+                            style="border-color:#ef4444; background: linear-gradient(90deg, rgba(239,68,68,0.05) 0%, transparent 100%); margin-bottom: 2rem;">
+                            <strong>May 2026 (Jhalokathi):</strong> 5-year-old child died this month due to a high-dose
+                            antibiotic error ("Prescription Blindness").
+                        </div>
+
+                        <h3 class="reveal"
+                            style="color:#00d4ff;font-family:'Orbitron';font-size:1.2rem;margin-bottom:0.5rem;">The
+                            Engineering Synergy</h3>
+                        <p class="reveal" style="color:#94a3b8;font-size:0.9rem;">We are a fusion of <strong>Mechanical
+                                Engineering</strong> and <strong>CSE</strong>. We don't just build software; we build
+                            "Infrastructure-Resilient Systems" capable of surviving 6-hour load-shedding windows in
+                            rural clinics.</p>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:20px; height: 100%; max-height: 60vh;">
+                        <div class="reveal img-container" style="flex:1;">
+                            <img src="News-Headline-Jhalokathi-Tragedy.png" alt="News Headline Evidence">
+                        </div>
+                        <div class="reveal glass-card safe-card" style="padding:1.5rem;">
+                            <p style="color:#00ff88; font-family:'Orbitron'; font-size:0.95rem; margin:0;">
+                                <strong>Regulatory Push:</strong> DNCRP
+                                is aggressively fining errors. Clinics are desperate for a tool that protects both
+                                patient lives and provider licenses.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="6">
+            <div class="content text-center">
+                <h2 class="reveal" style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:2rem;">
+                    Target Users & National Scale</h2>
+
+                <div style="display:flex; flex-direction:column; align-items:center; gap:15px;">
+
+                    <div class="reveal glass-card funnel-card"
+                        style="width:100%; max-width:800px; border-left:8px solid #00d4ff; text-align:left; --funnel-color: #00d4ff; --funnel-color-alpha: rgba(0,212,255,0.2);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3 style="color:#00d4ff;font-family:'Orbitron';font-size:1.5rem;margin:0;">TAM: 170 Million
+                            </h3>
+                            <span
+                                style="background:rgba(0,212,255,0.2); padding:4px 10px; border-radius:4px; font-size:0.8rem; color:#fff;">Total
+                                Nation</span>
+                        </div>
+                        <p style="color:#94a3b8;font-size:0.9rem; margin-top:5px;">Healthcare is universal. Foundational
+                            digital identity ceiling is the entire population.</p>
+                    </div>
+
+                    <div class="reveal glass-card funnel-card"
+                        style="width:80%; max-width:640px; border-left:8px solid #00ff88; text-align:left; --funnel-color: #00ff88; --funnel-color-alpha: rgba(0,255,136,0.2);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3 style="color:#00ff88;font-family:'Orbitron';font-size:1.3rem;margin:0;">SAM: 120+
+                                Million</h3>
+                            <span
+                                style="background:rgba(0,255,136,0.2); padding:4px 10px; border-radius:4px; font-size:0.8rem; color:#fff;">Mobile
+                                Users</span>
+                        </div>
+                        <p style="color:#94a3b8;font-size:0.9rem; margin-top:5px;">Realistic digital-ready population
+                            who can interact with Sovereign Wallets and QR hashes.</p>
+                    </div>
+
+                    <div class="reveal glass-card funnel-card"
+                        style="width:60%; max-width:480px; border-left:8px solid #ff6b00; text-align:left; --funnel-color: #ff6b00; --funnel-color-alpha: rgba(255,107,0,0.2);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3 style="color:#ff6b00;font-family:'Orbitron';font-size:1.1rem;margin:0;">SOM: 30 Million
+                                & 4k+ Clinics</h3>
+                            <span
+                                style="background:rgba(255,107,0,0.2); padding:4px 10px; border-radius:4px; font-size:0.8rem; color:#fff;">Execution
+                                Target</span>
+                        </div>
+                        <p style="color:#94a3b8;font-size:0.9rem; margin-top:5px;">Chronic care patients (highest DDI
+                            risk) and District Sadar hospitals lacking cloud infrastructure.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="7">
+            <div class="content">
+                <h2 class="reveal"
+                    style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:2rem;text-align:center;">
+                    Business Model & National Impact</h2>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <div class="reveal glass-card info-card">
+                            <h3 style="color:#00d4ff;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">Tier
+                                1: Clinical Land-Grab</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem;">Free-to-use for Doctors and Clinics. We
+                                eliminate financial friction to capture the network and establish the national standard.
+                            </p>
+                        </div>
+                        <div class="reveal glass-card safe-card">
+                            <h3 style="color:#00ff88;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">Tier
+                                2: Sovereign Safety Fee</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem;"><strong>10 BDT</strong> per digital prescription
+                                or 100 BDT for a 6-month pass. "Cup of tea" pricing generates massive B2C revenue at
+                                scale.</p>
+                        </div>
+                        <div class="reveal glass-card" style="border-left: 4px solid #a855f7;">
+                            <h3 style="color:#a855f7;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">Tier
+                                3: Enterprise Verification</h3>
+                            <p style="color:#94a3b8;font-size:0.85rem;">B2B API Licensing for Pharma Giants (Square,
+                                Beximco) to provide "Authenticity Portals" preventing counterfeit losses.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="reveal theory-text"
+                            style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                            <h3 style="color:#fff;font-family:'Orbitron';font-size:1.2rem;margin-bottom:1.5rem;">
+                                Sustainability Proof (2024-2025 Data)</h3>
+                            <ul
+                                style="list-style:none; padding:0; margin:0; font-size:0.95rem; line-height:2; color:#cbd5e1;">
+                                <li><span style="color:#00d4ff;">▪</span> Pharma market projected to surpass <strong>$6B
+                                        by 2025</strong>.</li>
+                                <li><span style="color:#00d4ff;">▪</span> NCDs account for <strong>67% of total
+                                        deaths</strong> in BD.</li>
+                                <li><span style="color:#00d4ff;">▪</span> <strong>30M+ citizens</strong> live with
+                                    chronic conditions requiring consistent, safe management.</li>
+                                <li
+                                    style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
+                                    <strong style="color:#00ff88;">The Inclusion Failsafe:</strong> Villagers without
+                                    smartphones are served via SMS OTP to feature phones, managed by hospital desks.
+                                    100% coverage.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="8">
+            <div class="content">
+                <h2 class="reveal"
+                    style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:2rem;text-align:center;">
+                    Competitive Advantage: The Active Moat</h2>
+
+                <div class="reveal">
+                    <table class="glass-table" style="margin-bottom:2rem;">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Manual Paper</th>
+                                <th>Standard E-Health</th>
+                                <th style="color:#00ff88; font-size:1rem;">IntelliScript BD</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Safety Logic</td>
+                                <td style="color:#ef4444;">Zero (Memory)</td>
+                                <td style="color:#ff6b00;">Passive (Data Entry)</td>
+                                <td style="color:#00ff88; font-weight:bold;">Active AI Interception</td>
+                            </tr>
+                            <tr>
+                                <td>Data Integrity</td>
+                                <td style="color:#ef4444;">High Forgery Risk</td>
+                                <td style="color:#ff6b00;">Basic DB Entry</td>
+                                <td style="color:#00ff88; font-weight:bold;">Cryptographic Hashing</td>
+                            </tr>
+                            <tr>
+                                <td>Clinical Speed</td>
+                                <td style="color:#00ff88;">Instant (Unsafe)</td>
+                                <td style="color:#ef4444;">Slow / Complex</td>
+                                <td style="color:#00ff88; font-weight:bold;">Engineered UX Speed</td>
+                            </tr>
+                            <tr>
+                                <td>Accessibility</td>
+                                <td style="color:#00ff88;">100% (Universal)</td>
+                                <td style="color:#ef4444;">20% (High-End Only)</td>
+                                <td style="color:#00ff88; font-weight:bold;">Sovereign & OTP Access</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="reveal glass-card" style="padding:0.85rem;">
+                        <p style="color:#94a3b8;font-size:0.85rem; margin:0;"><strong style="color:#00d4ff;">Interception vs.
+                                Documentation:</strong> Competitors record what happened after the fact. Our AI Sentinel
+                            is a "Hard-Stop" that prevents the error from ever leaving the desk.</p>
+                    </div>
+                    <div class="reveal glass-card" style="padding:0.85rem;">
+                        <p style="color:#94a3b8;font-size:0.85rem; margin:0;"><strong style="color:#00d4ff;">Sovereign vs.
+                                Siloed:</strong> Hospital databases trap your data. We put the cryptographic truth in
+                            the patient's hands, making it portable across the entire nation.</p>
+                    </div>
+                    <div class="reveal glass-card" style="padding:0.85rem;">
+                        <p style="color:#94a3b8;font-size:0.85rem; margin:0;"><strong style="color:#10b981;">Cryptographic Truth vs. PDFs:</strong> Turn forgeable prescription PDFs into immutable SHA-256 hashes, ensuring what the doctor wrote is exactly what the pharmacist sees.</p>
+                    </div>
+                    <div class="reveal glass-card" style="padding:0.85rem;">
+                        <p style="color:#94a3b8;font-size:0.85rem; margin:0;"><strong style="color:#ff6b00;">Mechanical Speed:</strong> Designed with a mechanical engineering mindset, our UI is stripped of friction, ensuring digital prescribing is as fast as handwriting but 100% safer.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="9">
+            <div class="content">
+                <h2 class="reveal"
+                    style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:2rem;text-align:center;">
+                    Validation: Proving the Demand</h2>
+
+                <div style="display:grid; grid-template-columns: 3fr 2fr; gap: 40px; align-items:stretch;">
+                    <div>
+                        <h3 class="reveal"
+                            style="color:#00d4ff;font-family:'Orbitron';font-size:1.2rem;margin-bottom:1rem;">Frontline
+                            Ground Truth</h3>
+                        <p class="reveal theory-text" style="font-style:italic;">"Current paper systems are a gamble
+                            with human life. An offline-resilient digital record isn't a luxury; it's a basic
+                            requirement for safe practice in our power-unstable clinics." <br><span
+                                style="font-style:normal; color:#64748b; font-size:0.8rem;">— Pathologist
+                                Feedback</span></p>
+
+                        <h3 class="reveal"
+                            style="color:#00ff88;font-family:'Orbitron';font-size:1.2rem;margin-bottom:1rem;">Patient
+                            Survey (N=22)</h3>
+                        <div class="reveal glass-card" style="padding:2rem;">
+                            <div class="vertical-chart-wrapper">
+                                <div class="vertical-chart">
+                                    <div class="bar-column">
+                                        <div class="bar-col-percent" style="color:#ef4444;">100%</div>
+                                        <div class="bar-col-fill"
+                                            style="background: linear-gradient(to top, rgba(239, 68, 68, 0.2), #ef4444); --target-height: 100%; --bar-glow: rgba(239, 68, 68, 0.6);">
+                                        </div>
+                                        <div class="bar-col-label">Fear of<br>Counterfeits</div>
+                                    </div>
+                                    <div class="bar-column">
+                                        <div class="bar-col-percent" style="color:#ff6b00;">86.4%</div>
+                                        <div class="bar-col-fill"
+                                            style="background: linear-gradient(to top, rgba(255, 107, 0, 0.2), #ff6b00); --target-height: 86.4%; --bar-glow: rgba(255, 107, 0, 0.6);">
+                                        </div>
+                                        <div class="bar-col-label">Blind<br>Allergies</div>
+                                    </div>
+                                    <div class="bar-column">
+                                        <div class="bar-col-percent" style="color:#00ff88;">81.8%</div>
+                                        <div class="bar-col-fill"
+                                            style="background: linear-gradient(to top, rgba(0, 255, 136, 0.2), #00ff88); --target-height: 81.8%; --bar-glow: rgba(0, 255, 136, 0.6);">
+                                        </div>
+                                        <div class="bar-col-label">Demand AI<br>Clinic</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display:flex; flex-direction:column; gap: 20px; justify-content:center; height:100%; max-height: 60vh;">
+                        <div class="reveal img-container" style="flex: 1; min-height: 0; max-height: 30vh;"><img
+                                src="Doctor.jpeg" alt="Field Interview with Doctor"></div>
+                        <div class="reveal img-container" style="flex: 1; min-height: 0; max-height: 30vh;"><img
+                                src="Patient01.jpeg" alt="Patient Interview Validation"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="10">
+            <div class="content text-center">
+                <h2 class="reveal" style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:3rem;">
+                    Roadmap: Path to National Safety</h2>
+
+                <div class="timeline-wrapper">
+                    <div class="reveal timeline-line"></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px;">
+                        <div class="reveal glass-card text-center timeline-card"
+                            style="border-top:4px solid #00d4ff; --node-color: #00d4ff;">
+                            <div class="timeline-node"></div>
+                            <div style="font-size:2rem; margin-bottom:10px;">🛠️</div>
+                            <h3 style="color:#00d4ff;font-family:'Orbitron';font-size:1rem;margin-bottom:0.5rem;">M 1-2:
+                                BUILD</h3>
+                            <p style="color:#94a3b8;font-size:0.8rem;">Map AI logic to top 500 drugs. Finalize HTML5
+                                localStorage for 6+ hr offline persistence. Complete SMS OTP Help-Desk.</p>
+                        </div>
+                        <div class="reveal glass-card text-center timeline-card staggered"
+                            style="border-top:4px solid #ff6b00; --node-color: #ff6b00;">
+                            <div class="timeline-node"></div>
+                            <div style="font-size:2rem; margin-bottom:10px;">🛡️</div>
+                            <h3 style="color:#ff6b00;font-family:'Orbitron';font-size:1rem;margin-bottom:0.5rem;">M 3:
+                                TEST
+                            </h3>
+                            <p style="color:#94a3b8;font-size:0.8rem;">Hardware Stress Test (SHA-256 generation < 2s on
+                                    10yo PCs). Independent Red-Team audit. DGDA documentation.</p>
+                        </div>
+                        <div class="reveal glass-card text-center timeline-card"
+                            style="border-top:4px solid #a855f7; --node-color: #a855f7; --node-color-alpha: rgba(168,85,247,0.7);">
+                            <div class="timeline-node pulse-node"></div>
+                            <div style="font-size:2rem; margin-bottom:10px;">🏥</div>
+                            <h3 style="color:#a855f7;font-family:'Orbitron';font-size:1rem;margin-bottom:0.5rem;">M 4:
+                                PILOT
+                            </h3>
+                            <p style="color:#94a3b8;font-size:0.8rem;">Launch 30-day "Live Beta" at District Sadar
+                                Hospital.
+                                Track full Doctor-Patient-Pharmacy loop and error reduction.</p>
+                        </div>
+                        <div class="reveal glass-card text-center timeline-card staggered"
+                            style="border-top:4px solid #00ff88; --node-color: #00ff88;">
+                            <div class="timeline-node"></div>
+                            <div style="font-size:2rem; margin-bottom:10px;">🚀</div>
+                            <h3 style="color:#00ff88;font-family:'Orbitron';font-size:1rem;margin-bottom:0.5rem;">M 5-6:
+                                SCALE</h3>
+                            <p style="color:#94a3b8;font-size:0.8rem;">Refine UX speed. Present a2i integration for
+                                national
+                                stack. Secure B2B Pharma supply-chain partnerships.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="11">
+            <div class="content text-center">
+                <h2 class="reveal" style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:3rem;">The
+                    Engineering Powerhouse</h2>
+
+                <div style="display:flex; justify-content:center; gap:60px;">
+                    <div class="reveal glass-card" style="width:400px; text-align:center;">
+                        <div
+                            style="width:120px; height:120px; background:rgba(0,212,255,0.1); border:3px solid #00d4ff; border-radius:50%; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; font-size:3.5rem; color:#00d4ff;">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </div>
+                        <h3 style="color:#fff;font-family:'Orbitron';font-size:1.3rem;margin-bottom:0.5rem;">Toki Tahmid
+                            Ornob</h3>
+                        <p
+                            style="color:#00d4ff;font-size:0.85rem; font-weight:bold; letter-spacing:1px; margin-bottom:15px; text-transform:uppercase;">
+                            Systems Architect</p>
+                        <p style="color:#94a3b8;font-size:0.9rem;">Mechanical Engineering core. Directs the
+                            "Mechanical-to-Digital" workflow, ensuring the software remains compatible with the
+                            rigorous, fast-paced reality of clinical environments.</p>
+                    </div>
+                    <div class="reveal glass-card" style="width:400px; text-align:center;">
+                        <div
+                            style="width:120px; height:120px; background:rgba(0,255,136,0.1); border:3px solid #00ff88; border-radius:50%; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; font-size:3.5rem; color:#00ff88;">
+                            <i class="fa-solid fa-laptop-code"></i>
+                        </div>
+                        <h3 style="color:#fff;font-family:'Orbitron';font-size:1.3rem;margin-bottom:0.5rem;">Tabasum
+                            Aktar</h3>
+                        <p
+                            style="color:#00ff88;font-size:0.85rem; font-weight:bold; letter-spacing:1px; margin-bottom:15px; text-transform:uppercase;">
+                            Security Architect</p>
+                        <p style="color:#94a3b8;font-size:0.9rem;">CSE specialization. Leads the development of the AI
+                            Sentinel, SHA-256 encryption logic, and the un-crashable Offline HTML5 platform.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" data-slide="12">
+            <div class="content">
+                <h2 class="reveal"
+                    style="font-family:'Orbitron';font-size:2.5rem;color:#e2e8f0;margin-bottom:2rem;text-align:center;">
+                    The Ask: Securing the National Grid</h2>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="reveal glass-card safe-card" style="padding:1.2rem;">
+                        <h3 style="color:#00ff88;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">1. Seed
+                            Funding</h3>
+                        <p style="color:#94a3b8;font-size:0.85rem;">Capital for server architecture and SMS gateway
+                            scaling to maintain the high-availability Rural OTP Inclusion Protocol.</p>
+                    </div>
+                    <div class="reveal glass-card info-card" style="padding:1.2rem;">
+                        <h3 style="color:#00d4ff;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">2. Pilot
+                            Partnerships</h3>
+                        <p style="color:#94a3b8;font-size:0.85rem;">Direct access to District Sadar Hospitals to gather
+                            real-world validation of the "Doctor-to-Pharmacy" loop under pressure.</p>
+                    </div>
+                    <div class="reveal glass-card alert-card" style="padding:1.2rem; border-color:#a855f7;">
+                        <h3 style="color:#a855f7;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">3.
+                            Regulatory Mentorship</h3>
+                        <p style="color:#94a3b8;font-size:0.85rem;">Guidance from a2i and DGDA to achieve formal
+                            certification and align perfectly with the National Digital Health Stack.</p>
+                    </div>
+                    <div class="reveal glass-card info-card" style="padding:1.2rem; border-color:#ff6b00;">
+                        <h3 style="color:#ff6b00;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">4. Lab
+                            Support</h3>
+                        <p style="color:#94a3b8;font-size:0.85rem;">Access to specialized electronic systems labs to
+                            stress-test our offline architecture on 10+ year-old hospital PCs.</p>
+                    </div>
+                    <div class="reveal glass-card safe-card"
+                        style="grid-column: 1 / -1; padding:1.2rem; text-align:center;">
+                        <h3 style="color:#00ff88;font-family:'Orbitron';font-size:1.1rem;margin-bottom:0.5rem;">5.
+                            Workplace Hub</h3>
+                        <p style="color:#94a3b8;font-size:0.85rem;">Access to a Med-Tech Incubation Center to provide a
+                            "War Room" for rapid hardware/software integration and secure stakeholder meetings.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">&#8249;</button>
+        <div class="slide-dots" id="dots"></div>
+        <button class="nav-btn" onclick="changeSlide(1)">&#8250;</button>
+    </div>
+
+    <script>
+        // ----- SLIDE NAVIGATION LOGIC -----
+        let current = 1;
+        const total = document.querySelectorAll('.slide').length;
+        const dotsContainer = document.getElementById('dots');
+
+        for (let i = 1; i <= total; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot' + (i === 1 ? ' active' : '');
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
+        }
+
+        function goToSlide(n) {
+            const prev = document.querySelector('.slide.active');
+            const next = document.querySelector(`.slide[data-slide="${n}"]`);
+            if (prev) prev.classList.remove('active');
+            if (next) { next.classList.add('active'); animateSlide(next); }
+            current = n;
+            updateNav();
+        }
+
+        function changeSlide(dir) {
+            let next = current + dir;
+            if (next < 1) next = total;
+            if (next > total) next = 1;
+            goToSlide(next);
+        }
+
+        function updateNav() {
+            document.querySelectorAll('.dot').forEach((d, i) => {
+                d.classList.toggle('active', i + 1 === current);
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changeSlide(-1); }
+        });
+
+        function animateSlide(slide) {
+            slide.querySelectorAll('.reveal').forEach((el, i) => {
+                el.style.transition = 'none';
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.offsetHeight;
+                const delay = i * 0.12;
+                el.style.transition = `opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`;
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0px)';
+            });
+        }
+
+        // ----- CUSTOM CURSOR DYNAMICS -----
+        const cursorDot = document.getElementById('cursorDot');
+        const cursorTrail = document.getElementById('cursorTrail');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let trailX = mouseX;
+        let trailY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorDot.style.left = mouseX + 'px';
+            cursorDot.style.top = mouseY + 'px';
+        });
+
+        function animateCursor() {
+            trailX += (mouseX - trailX) * 0.2;
+            trailY += (mouseY - trailY) * 0.2;
+            cursorTrail.style.left = trailX + 'px';
+            cursorTrail.style.top = trailY + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        document.addEventListener('mousedown', () => { cursorTrail.style.width = '20px'; cursorTrail.style.height = '20px'; });
+        document.addEventListener('mouseup', () => { cursorTrail.style.width = '30px'; cursorTrail.style.height = '30px'; });
+
+        // ----- LIVELY PLEXUS BACKGROUND -----
+        const canvas = document.getElementById('plexusCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = [];
+        const particleCount = 70;
+        const connectionDistance = 120;
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                size: Math.random() * 2 + 0.5,
+            });
+        }
+
+        function animatePlexus() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particleCount; i++) {
+                let p = particles[i];
+
+                const dx = p.x - mouseX;
+                const dy = p.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 150) {
+                    const force = (150 - dist) / 150;
+                    p.vx += (dx / dist) * force * 0.05;
+                    p.vy += (dy / dist) * force * 0.05;
+                }
+
+                p.vx *= 0.99;
+                p.vy *= 0.99;
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(0, 212, 255, 0.4)";
+                ctx.fill();
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                for (let j = i + 1; j < particleCount; j++) {
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < connectionDistance) {
+                        const opacity = 1 - (dist / connectionDistance);
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(0, 212, 255, ${opacity * 0.2})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animatePlexus);
+        }
+        animatePlexus();
+
+        // Init Start
+        try { animateSlide(document.querySelector('.slide.active')); } catch (e) { }
+    </script>
+</body>
+
+</html>
